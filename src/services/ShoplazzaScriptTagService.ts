@@ -1,6 +1,8 @@
 import axios from "axios";
+import { Service } from "typedi";
 
-export class ShoplazzaScriptTagService {
+@Service()
+export default class ShoplazzaScriptTagService {
     async newScriptTag(shop, accessToken, script) {
         console.log("----", shop, accessToken, script)
         await axios.post(`https://${shop}/openapi/2022-01/script_tags_new`, script, {
@@ -51,5 +53,3 @@ export class ShoplazzaScriptTagService {
         return data;
     }
 }
-
-export default new ShoplazzaScriptTagService();

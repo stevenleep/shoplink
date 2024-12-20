@@ -10,7 +10,6 @@ export const objectToQueryString = (obj: any) => {
 /**
  * query string to object
  */
-
 export const queryStringToObject = (query: string) => {
     return query.split("&").reduce((acc, cur) => {
         const [key, value] = cur.split("=");

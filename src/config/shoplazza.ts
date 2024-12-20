@@ -5,5 +5,15 @@ export const SHOPLAZZA_CONFIG = {
 };
 
 export const SHOPLAZZA_APP_SCOPES = SHOPLAZZA_CONFIG.SCOPES;
-export const SHOPLAZZA_APP_BASE_URL = "https://usually-valid-weevil.ngrok-free.app";
+export const SHOPLAZZA_APP_BASE_URL = process.env.SERVER_URL;
 export const SHOPLAZZA_APP_REDIRECT_URI = `${SHOPLAZZA_APP_BASE_URL}/api/shoplazza/auth/callback`;
+
+export const config = {
+    manifest_real_path: process.env.SHOPLAZZA_MANIFEST_REAL_PATH,
+    manifest_proxy_url: process.env.SHOPLAZZA_MANIFEST_PROXY_URL,
+
+    static_proxy_real_path: process.env.SHOPLAZZA_STATIC_REAL_PATH,
+    static_proxy_proxy_url: process.env.SHOPLAZZA_STATIC_PROXY_URL,
+};
+
+export default config;

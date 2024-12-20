@@ -1,8 +1,8 @@
-import { Get, Res, Post, Put, Req, Delete, Controller, Body } from "routing-controllers";
+import { Get, Res, Post, Put, Req, Delete, Controller, Body} from "routing-controllers";
 import { Service } from "typedi";
 import AliyunOSSService from "@/services/AliyunOSSService";
-import ManifestRepository from "@/services/ManifestRepository";
-import FileRepository from "@/services/FileRepository";
+import ManifestRepository from "@/repository/ManifestRepository";
+import FileRepository from "@/repository/FileRepository";
 import { genManifestJSONBolb, createManifestJSONConfig } from "@/utils/manifest";
 import { ManifestFileProcess } from "@/types/Manifest";
 import logger from "@/utils/logger";
@@ -59,7 +59,7 @@ export class ManifestController {
   }
 
   @Post("/:shop_id")
-  async create(@Req() req, @Res() res) {
+  async create(@Req() req, @Res() res, @Body() body = {}) {
     const { shop_id } = req.params || {};
     if (!shop_id) {
       return res.status(400).json({ code: 400, message: 'shop_id is required' });
@@ -71,7 +71,7 @@ export class ManifestController {
     // Asynchronously save files to OSS and database (mongodb/mysql)
     // creation of the manifest.json file is done by the store administrator in the background and users will not use it immediately.
     setTimeout(async () => {
-      const manifestJSONConfig = createManifestJSONConfig({});
+      const manifestJSONConfig = createManifestJSONConfig(body);
       this.manifestRepository.create({ ...responseResult, manifest: manifestJSONConfig }).then(() => {
         logger.info('save manifest.json to database success');
         const manifestFile = genManifestJSONBolb(manifestJSONConfig);

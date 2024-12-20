@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>首页</title> 
+    </head>
+
+    <script src="/static/javascripts/index.js"></script>
+    <body>
+        <h1>{{ shop_id }}/h1>
+        <p>hsdilhs</p>
+        <hr />
+
+        <h2>
+            <pre>
+                {{shop_info}}
+            </pre>
+        </h2>
+
+        <button id="enable">点击显示</button>
+    </body>
+</html>

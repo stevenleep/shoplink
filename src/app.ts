@@ -25,7 +25,7 @@ const app: Application = express();
 
 // Database
 mongoose
-  .connect(storageConfig.mongodb.uri)
+  .connect(storageConfig.mongodb.uri!)
   .then((mongoose) => {
     logger.info('Connected to MongoDB', mongoose.connection.name, mongoose.connection.readyState);
   })

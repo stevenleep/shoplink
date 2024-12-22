@@ -15,7 +15,7 @@ import storageConfig from '@/config/storage';
 import logger from '@/utils/logger';
 import errorHandler from '@/middleware/errorMiddleware';
 import shutdownSignalsHandler from '@/middleware/shoutdownMiddleware';
-import { setupStatic, setupRenderEnigine } from '@/middleware/staticMiddleware';
+import { setupStatic } from '@/middleware/staticMiddleware';
 import { HealthController } from '@/controllers/HealthController';
 
 dotenv.config();
@@ -34,7 +34,6 @@ mongoose
     process.exit(1);
   });
 
-setupRenderEnigine(app);
 setupStatic(app);
 
 // Middleware

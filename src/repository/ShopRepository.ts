@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
-import ShoplazzaShopModel from '@/models/ShoplazzaShopModel';
+import ShoplazzaShopModel from '@/models/ShopModel';
 
 @Service()
-export default class ShoplazzaStoreRepository {
+export default class ShopRepository {
   async create(data = {}) {
     return ShoplazzaShopModel.create(data);
   }
@@ -17,5 +17,9 @@ export default class ShoplazzaStoreRepository {
 
   async findOneById(id: string) {
     return ShoplazzaShopModel.findById(id);
+  }
+
+  async findOne(query = {}) {
+    return ShoplazzaShopModel.findOne(query);
   }
 }

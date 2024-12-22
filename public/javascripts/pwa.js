@@ -16,7 +16,7 @@ document.head.appendChild(link);
 // 注册service worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
-    .register('/apps/pwa/static/static/javascripts/service-worker.js')
+    .register('/apps/pwa/configs/shop/javascripts/service-worker.js')
     .then((registration) => {
       console.log('ServiceWorker registration successful with scope: ', registration.scope);
       //   registration.pushManager.getSubscription().then((subscription) => {

@@ -1,5 +1,7 @@
 import { Controller, Get, Res } from 'routing-controllers';
+import { Service } from 'typedi';
 
+@Service()
 @Controller('/users')
 export class UserController {
   @Get('/')

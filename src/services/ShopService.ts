@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 import axios from 'axios';
-import ShoplazzaStoreRepository from '@/repository/ShoplazzaShopRepository';
+import ShoplazzaStoreRepository from '@/repository/ShopRepository';
 import logger from '@/utils/logger';
 
 @Service()
@@ -20,8 +20,16 @@ export default class ShoplazzaShopService {
     if (shopInfoResponse) {
       const shopInfo = shopInfoResponse.data;
       const shop = shopInfo?.shop || {};
-      await this.shoplazzaStoreRepository.create(shop);
+      // await this.shoplazzaStoreRepository.create(shop);
       return shop;
     }
+  }
+
+  async checkInstall(store_id: string) {
+    return await this.shoplazzaStoreRepository.findOne({
+      store_id,
+      id: store_id,
+      is_deleted: false,
+    });
   }
 }

@@ -3,7 +3,7 @@ import { SHOPLAZZA_APP_REDIRECT_URI, SHOPLAZZA_CONFIG } from '@/config/shoplazza
 import { Service } from 'typedi';
 
 @Service()
-export default class ShoplazzaService {
+export default class ShoplazzaAuthService {
   public async getAccessToken(shop: string, code: string) {
     const url = `https://${shop}/admin/oauth/token`;
     const data = {
@@ -13,7 +13,7 @@ export default class ShoplazzaService {
       grant_type: 'authorization_code',
       redirect_uri: SHOPLAZZA_APP_REDIRECT_URI,
     };
-    const response = await axios.post(url, data).catch((error) => {
+    const response = await axios.post(url, data).catch(() => {
       return { data: {} };
     });
 

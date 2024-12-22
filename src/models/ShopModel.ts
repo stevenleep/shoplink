@@ -3,6 +3,9 @@ import mongooseDelete from 'mongoose-delete';
 
 const ShoplazzaShopModelSchema = new Schema(
   {
+    id: { type: Number, required: true },
+    store_id: { type: Number, required: true },
+    token: { type: String, required: true },
     shop: { type: Object, required: true },
   },
   { timestamps: true },

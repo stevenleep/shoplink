@@ -1,10 +1,10 @@
-import { Service } from "typedi";
-import FileModel from "@/models/FileModel";
+import { Service } from 'typedi';
+import FileModel from '@/models/FileModel';
 
 @Service()
 export default class FileRepository {
   async create(data = {}) {
-   return FileModel.create(data);
+    return FileModel.create(data);
   }
 
   async updateById(id: string, data: any) {

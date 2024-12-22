@@ -75,6 +75,9 @@ export class ShoplazzaAuthController {
 
     if (token) {
       this.shoplazzaAppProxyService.setContext(shop, token);
+
+      console.log('------ token ----->', token);
+
       // 获取店铺信息
       const shopInfo: any = await this.shoplazzaShopService.getShopInfo(shop, token);
       if (!shopInfo) {

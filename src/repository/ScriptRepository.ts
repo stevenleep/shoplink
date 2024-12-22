@@ -25,15 +25,11 @@ export default class ScriptRepository {
   }
 
   async findById(store_id: string, event_type: string) {
-    return ScriptModel.findOne({ store_id, event_type });
+    return ScriptModel.findOne({ store_id, event_type }).select('-_id').lean();
   }
 
   // 查询店铺下的指定类型的脚本
   async findByStoreIdAndEventType(storeId: string, eventType: string) {
-    return ScriptModel.findOne({
-      store_id: storeId,
-      event_type: eventType,
-      status: 'active',
-    });
+    return ScriptModel.findOne({ store_id: storeId, event_type: eventType }).lean();
   }
 }

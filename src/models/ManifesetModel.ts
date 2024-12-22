@@ -2,7 +2,8 @@ import { ManifestFileProcess } from '@/types/Manifest';
 import mongoose, { Schema } from 'mongoose';
 import mongooseDelete from 'mongoose-delete';
 
-const ManifestSchema = new Schema({
+const ManifestSchema = new Schema(
+  {
     id: { type: String, required: true },
     created_at: { type: Date, required: true },
     shop_id: { type: String, required: true },
@@ -12,10 +13,11 @@ const ManifestSchema = new Schema({
     file_name: { type: String, required: true },
     type: { type: String, required: false, default: 'json' },
     path: { type: String, required: true },
-},
-    {
-        timestamps: true,
-    }
+    manifest: { type: Object, required: true, default: {} },
+  },
+  {
+    timestamps: true,
+  },
 );
 
 // Indexes
@@ -25,8 +27,8 @@ ManifestSchema.index({ manifest_id: 1 }, { unique: true });
 
 // Soft delete plugin
 ManifestSchema.plugin(mongooseDelete, {
-    overrideMethods: true,
-    deletedAt: true,
+  overrideMethods: true,
+  deletedAt: true,
 });
 
 export default mongoose.model('Manifest', ManifestSchema);

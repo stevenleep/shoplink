@@ -1,8 +1,8 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import express, { Application } from 'express';
-import { useExpressServer, useContainer } from "routing-controllers";
+import { useExpressServer, useContainer } from 'routing-controllers';
 import { Server } from 'http';
 import { Container } from 'typedi';
 import path from 'path';
@@ -22,8 +22,10 @@ dotenv.config();
 useContainer(Container);
 
 const app: Application = express();
+
 // Database
-mongoose.connect(storageConfig.mongodb.uri)
+mongoose
+  .connect(storageConfig.mongodb.uri)
   .then((mongoose) => {
     logger.info('Connected to MongoDB', mongoose.connection.name, mongoose.connection.readyState);
   })
@@ -51,7 +53,7 @@ app.use((req, res, next) => {
 
 // Controllers
 useExpressServer(app, {
-  routePrefix: "/health",
+  routePrefix: '/health',
   controllers: [HealthController],
 });
 useExpressServer(app, {

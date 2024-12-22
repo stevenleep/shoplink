@@ -1,10 +1,9 @@
 import express, { Application } from 'express';
 import artTemplate from 'art-template';
 import expressArtTemplate from 'express-art-template';
-import { staticPath, staticOptions, viewEngine, viewPath } from "@/config/path";
+import { staticPath, staticOptions, viewEngine, viewPath } from '@/config/path';
 
-export function setupStatic(app: Application
-): void {
+export function setupStatic(app: Application): void {
   app.use('/static', express.static(staticPath, staticOptions));
 }
 

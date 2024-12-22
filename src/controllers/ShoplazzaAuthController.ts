@@ -1,21 +1,38 @@
-import { Service } from "typedi";
-import { Controller, Get, Req, Res } from "routing-controllers";
-import ShoplazzaAuthService from "@/services/ShoplazzaAuthService";
+import { Service } from 'typedi';
+import { Controller, Get, Req, Res } from 'routing-controllers';
+import ShoplazzaAuthService from '@/services/ShoplazzaAuthService';
 import { objectToQueryString } from '@/utils/params';
-import { SHOPLAZZA_CONFIG, SHOPLAZZA_APP_SCOPES, SHOPLAZZA_APP_REDIRECT_URI } from "@/config/shoplazza";
-import ShoplazzaAppProxyService from "@/services/ShoplazzaAppProxyService";
-import ShoplazzaShopService from "@/services/ShoplazzaShopService";
-import shoplazzaConfig from "@/config/shoplazza";
-import axios from "axios";
+import {
+  SHOPLAZZA_CONFIG,
+  SHOPLAZZA_APP_SCOPES,
+  SHOPLAZZA_APP_REDIRECT_URI,
+} from '@/config/shoplazza';
+import ShoplazzaAppProxyService from '@/services/ShoplazzaAppProxyService';
+import ShoplazzaShopService from '@/services/ShoplazzaShopService';
+import shoplazzaConfig from '@/config/shoplazza';
+import ManifestService from '@/services/ManifestService';
+import { CreateManifestFileResultModel } from '@/models/FileModel';
+
+const shopAppProxyConfigs = [
+  {
+    real_path: shoplazzaConfig.manifest_real_path!,
+    proxy_url: shoplazzaConfig.manifest_proxy_url!,
+  },
+  {
+    real_path: shoplazzaConfig.static_proxy_real_path!,
+    proxy_url: shoplazzaConfig.static_proxy_proxy_url!,
+  },
+];
 
 @Service()
-@Controller("/shoplazza/auth")
+@Controller('/shoplazza/auth')
 export class ShoplazzaAuthController {
   constructor(
     private readonly shoplazzaAuthService: ShoplazzaAuthService,
     private readonly shoplazzaAppProxyService: ShoplazzaAppProxyService,
     private readonly shoplazzaShopService: ShoplazzaShopService,
-  ) { }
+    private readonly manifestService: ManifestService,
+  ) {}
 
   public genAuthState(store_id, shop) {
     return Buffer.from(`${store_id}-${shop}-${Date.now()}`).toString('base64');
@@ -33,64 +50,44 @@ export class ShoplazzaAuthController {
     return `https://${shop}/admin/oauth/authorize?${query}`;
   }
 
-  @Get("/")
+  // 授权
+  @Get('/')
   async auth(@Req() req, @Res() res) {
     const { shop, store_id } = req.query;
-    const redirect_uri = this.genAppInstallUrl(shop, store_id);
-    res.redirect(redirect_uri, 302, { message: '授权成功' });
+    // TODO: 如果已经授权过, 则直接跳转到首页
+    res.redirect(302, this.genAppInstallUrl(shop, store_id));
     return res;
   }
 
-  @Get("/callback")
+  // 授权回调
+  @Get('/callback')
   async authCallback(@Req() req, @Res() res) {
-    const { code, hmac, shop, state } = req.query;
+    const { code, shop } = req.query;
     const token = await this.shoplazzaAuthService.getAccessToken(shop, code);
     if (token) {
-      const shopInfo: any = this.shoplazzaShopService.getShopInfo(shop, token);
-      if (!shopInfo) {
-        res.status(401).json({ message: '获取店铺信息失败' });
-        return res;
-      }
-
       this.shoplazzaAppProxyService.setContext(shop, token);
-      const manifest_proxy = this.shoplazzaAppProxyService.create({
-        real_path: shoplazzaConfig.manifest_real_path!,
-        proxy_url: shoplazzaConfig.manifest_proxy_url!,
-      });
-      const app_proxy = this.shoplazzaAppProxyService.create({
-        real_path: shoplazzaConfig.static_proxy_real_path!,
-        proxy_url: shoplazzaConfig.static_proxy_proxy_url!,
-      });
-
-      const allProxyResponse = await Promise.allSettled([manifest_proxy, app_proxy]);
-      if (allProxyResponse.some((response) => response.status === 'rejected')) {
-        res.status(500).json({ message: '代理失败', code: -1, data: null });
+      const shopInfo: any = await this.shoplazzaShopService.getShopInfo(shop, token);
+      if (!shopInfo) {
+        res.status(401).json({ message: '获取店铺信息失败', code: -1, data: null });
         return res;
       }
 
-      await axios.post(`http://127.0.0.1:3000/api/manifests/${shopInfo?.id}`, {
-        name: shopInfo?.name,
-        short_name: shopInfo?.name,
-        lang: shopInfo?.primary_locale || 'zh-CN',
-        description: shopInfo?.name,
-      })
-        .then((response) => {
-          console.log('response ====>', response.data);
-        })
-        .catch((error) => {
-          console.error('error ====>', error);
-        });
+      // 即使穿件失败也不影响授权成功, 错误的情况将会在后续访问首页时处理
+      await this.shoplazzaAppProxyService.createMany(shopAppProxyConfigs);
 
-      res.cookie('token', token, { maxAge: 900000, httpOnly: true, sameSite: "strict", secure: true });
-      res.render("index", {
-        shop_id: shop,
-        message: '授权成功',
-        shop_info: JSON.stringify({ shop, token, state, shopInfo }),
-      });
+      // 创建manifest.json文件并上传到oss
+      const { id, name, primary_locale } = shopInfo || {};
+      const mainfestId = this.manifestService.genManifestID(id);
+      await this.manifestService.createAndputManifest(
+        mainfestId,
+        { name, short_name: name, lang: primary_locale || 'zh-CN', description: name },
+        new CreateManifestFileResultModel(id, mainfestId),
+      );
+      res.render('index', { shop_info: JSON.stringify({ token, shopInfo }) });
       return res;
     }
 
-    res.status(401).json({ message: '授权失败' })
+    res.status(401).json({ code: -1, data: null, message: '授权失败' });
     return res;
   }
 }

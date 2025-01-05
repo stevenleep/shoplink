@@ -1,9 +1,9 @@
 import { Service } from 'typedi';
 import { ManifestFileProcess } from '@/types/Manifest';
 import { createManifestJSONConfig, genManifestJSONBolb } from '@/utils/manifest';
-import ManifestRepository from '@/repository/ManifestRepository';
+import ManifestRepository from '@/models/repository/ManifestRepository';
 import AliyunOSSService from '@/services/AliyunOSSService';
-import FileRepository from '@/repository/FileRepository';
+import FileRepository from '@/models/repository/FileRepository';
 import logger from '@/utils/logger';
 import { CreateManifestFileResultModel, ManifestFileModel } from '@/models/FileModel';
 import { nanoid } from '@/utils/id';
